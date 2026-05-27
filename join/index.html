@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Join Ours</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #FDF6F0; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { text-align: center; padding: 40px; }
+    h1 { color: #3D2418; font-size: 24px; margin-bottom: 8px; }
+    p { color: #8B6356; font-size: 16px; }
+    #msg { display: none; margin-top: 20px; }
+    .code { background: #F2D8CE; border-radius: 12px; padding: 12px 24px; font-size: 20px; font-weight: 700; color: #3D2418; letter-spacing: 2px; margin-top: 12px; display: inline-block; }
+  </style>
+  <script>
+    window.onload = function() {
+      const parts = window.location.pathname.split('/');
+      const code = parts[parts.length - 1];
+      if (code && code !== 'join') {
+        document.getElementById('codeDisplay').textContent = code;
+        window.location.href = 'ours://join/' + code;
+      }
+      setTimeout(() => {
+        document.getElementById('msg').style.display = 'block';
+      }, 1500);
+    };
+  </script>
+</head>
+<body>
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:16px">💍💍</div>
+    <h1>Opening Ours...</h1>
+    <p>You've been invited to connect on Ours 💕</p>
+    <div id="msg">
+      <p>If the app didn't open, enter this code manually:</p>
+      <div class="code" id="codeDisplay"></div>
+    </div>
+  </div>
+</body>
+</html>
