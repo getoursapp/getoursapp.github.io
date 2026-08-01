@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ours — Everything that's ours.</title>
+  <meta name="description" content="Ours is a private app for the two of you — distance, countdowns, daily questions, time capsules, and a shared calendar. Coming soon to the App Store.">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf7f2;
+      --warm-white: #fff9f4;
+      --ink: #1a1612;
+      --muted: #6b6460;
+      --accent: #c9705a;
+      --accent-soft: #e9cdc1;
+      --border: #e8e0d8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Hero */
+    header {
+      text-align: center;
+      padding: 6rem 2rem 4.5rem;
+    }
+
+    .rings {
+      width: 92px;
+      height: 56px;
+      position: relative;
+      margin: 0 auto 2rem;
+    }
+
+    .ring {
+      position: absolute;
+      top: 0;
+      width: 56px;
+      height: 56px;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+    }
+
+    .ring:first-child { left: 0; }
+    .ring:last-child { right: 0; }
+
+    .wordmark {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 4.5rem;
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+    }
+
+    .tagline {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1.35rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .lede {
+      max-width: 440px;
+      margin: 0 auto 2.5rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.6rem 1.4rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Features */
+    .features {
+      border-top: 1px solid var(--border);
+      padding: 4rem 0 4.5rem;
+    }
+
+    .features h2 {
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 2.75rem;
+    }
+
+    .feature {
+      display: flex;
+      gap: 1.1rem;
+      align-items: flex-start;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature:last-child { border-bottom: none; }
+
+    .feature .dot {
+      flex: none;
+      width: 10px;
+      height: 10px;
+      margin-top: 0.55rem;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      border: 2px solid var(--accent);
+    }
+
+    .feature h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.1rem;
+    }
+
+    .feature p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* Both-of-you note */
+    .note {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 1.4rem 1.6rem;
+      margin: 0 0 4rem;
+    }
+
+    .note p { font-size: 0.95rem; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.25rem 2rem 3rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    footer nav {
+      margin-bottom: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      margin: 0 0.7rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    footer a:hover { border-bottom-color: var(--accent); }
+
+    .age {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 4rem 1.5rem 3rem; }
+      .wordmark { font-size: 3.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="rings" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="ring"></div>
+  </div>
+  <h1 class="wordmark">Ours</h1>
+  <p class="tagline">Everything that's ours.</p>
+  <p class="lede">A private space for the two of you — however many miles sit in between. See your distance live, count down to the next visit, and discover each other through questions you'd never think to ask.</p>
+  <span class="badge">Coming soon to the App&nbsp;Store</span>
+</header>
+
+<main class="wrap">
+  <section class="features">
+    <h2>Made for two.</h2>
+
+    <div class="feature">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h3>Distance &amp; countdowns</h3>
+        <p>See how far apart you are right now — and exactly how long until you're together again.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h3>Daily questions</h3>
+        <p>Hundreds of prompts, from playful to deep. Answer first, then see what they said.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h3>In Sync</h3>
+        <p>A daily guessing game — send three questions, read their answers, guess their secret number.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h3>Time capsules</h3>
+        <p>Write something today that unlocks for your partner on the date you choose.</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <h3>A shared calendar</h3>
+        <p>Visits, anniversaries, date nights — one place, for both of you.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <p><strong>One subscription, both of you.</strong> Ours Pro unlocks everything — and your linked partner gets it automatically. No feed, no strangers, no ads, and your data is never sold.</p>
+  </div>
+</main>
+
+<footer>
+  <nav>
+    <a href="/faq">FAQ</a>
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="mailto:support@getours.site">Support</a>
+  </nav>
+  &copy; 2026 Ours · getours.site
+  <br>
+  <span class="age">For adults 18+</span>
+</footer>
+
+</body>
+</html>
