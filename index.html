@@ -191,7 +191,7 @@
   </style>
   <style id="ours-intro-css">
     /* ===== Ours intro (Countdown): the lid's two corner rings count down from 1,490 km and become the logo =====
-       Plays on every visit (not when arriving from another page of this site); ?intro forces it. Skipped with Reduce Motion. */
+       Plays once per visitor; add ?intro to the address to see it again. Skipped with Reduce Motion. */
     html.intro header > :not(.rings), html.intro main, html.intro footer, html.intro header .rings { opacity: 0; animation: oiFail .3s 5s forwards; }
     @keyframes oiFail { to { opacity: 1; } }  /* failsafe: the page always appears, even if the script dies */
     html.intro-reveal header > :not(.rings), html.intro-reveal main, html.intro-reveal footer { animation: oiIn .7s cubic-bezier(.2,.7,.2,1) both; }
@@ -213,12 +213,13 @@
   <script>
     (function () {
       try {
-        var force = /[?&]intro(=|&|$)/.test(location.search);  // ?intro always plays (you asked for it)
-        if (!force && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        // every visit and every reload; not when coming back from /faq, /terms or /privacy
-        var fromOwnPage = !!document.referrer && document.referrer.indexOf(location.origin + '/') === 0;
-        if (force || !fromOwnPage) document.documentElement.classList.add('intro');
-      } catch (e) { /* just show the page */ }
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var force = /[?&]intro(=|&|$)/.test(location.search);
+        if (force || !localStorage.getItem('ours-intro-seen')) {
+          document.documentElement.classList.add('intro');
+          localStorage.setItem('ours-intro-seen', '1');
+        }
+      } catch (e) { /* no storage: just show the page */ }
     })();
   </script>
 </head>
