@@ -213,8 +213,8 @@
   <script>
     (function () {
       try {
-        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        var force = /[?&]intro(=|&|$)/.test(location.search);
+        var force = /[?&]intro(=|&|$)/.test(location.search);  // ?intro always plays (you asked for it)
+        if (!force && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         if (force || !localStorage.getItem('ours-intro-seen')) {
           document.documentElement.classList.add('intro');
           localStorage.setItem('ours-intro-seen', '1');
