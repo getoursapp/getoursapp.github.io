@@ -189,6 +189,39 @@
       .wordmark { font-size: 3.4rem; }
     }
   </style>
+  <style id="ours-intro-css">
+    /* ===== Ours intro (Countdown): the lid's two corner rings count down from 1,490 km and become the logo =====
+       Plays once per visitor; add ?intro to the address to see it again. Skipped with Reduce Motion. */
+    html.intro header > :not(.rings), html.intro main, html.intro footer, html.intro header .rings { opacity: 0; animation: oiFail .3s 5s forwards; }
+    @keyframes oiFail { to { opacity: 1; } }  /* failsafe: the page always appears, even if the script dies */
+    html.intro-reveal header > :not(.rings), html.intro-reveal main, html.intro-reveal footer { animation: oiIn .7s cubic-bezier(.2,.7,.2,1) both; }
+    html.intro-reveal header > :nth-child(3) { animation-delay: .07s; }
+    html.intro-reveal header > :nth-child(4) { animation-delay: .14s; }
+    html.intro-reveal header > :nth-child(5) { animation-delay: .21s; }
+    html.intro-reveal main, html.intro-reveal footer { animation-delay: .28s; }
+    @keyframes oiIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    #ours-intro { position: fixed; inset: 0; z-index: 9999; background: var(--cream); overflow: hidden; cursor: pointer;
+                  -webkit-tap-highlight-color: transparent; animation: oiGone .4s 5s forwards; }
+    @keyframes oiGone { to { opacity: 0; visibility: hidden; } }
+    #ours-intro svg { position: absolute; left: 0; top: 0; overflow: visible; }
+    #ours-intro .oi-field { will-change: transform, opacity; transform-origin: 50% 50%; }
+    #ours-intro .oi-txt { position: absolute; left: 0; right: 0; text-align: center; opacity: 0; pointer-events: none; }
+    .oi-txt .n { display: block; font: 500 clamp(1.9rem, 7vw, 3rem)/1.1 'DM Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -.01em; }
+    .oi-txt .s { display: block; font: 400 .8rem/1.6 'DM Sans', system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    .oi-txt .w { display: block; font: italic 300 clamp(2rem, 8vw, 3.2rem)/1.1 'Fraunces', Georgia, serif; color: var(--accent); }
+  </style>
+  <script>
+    (function () {
+      try {
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var force = /[?&]intro(=|&|$)/.test(location.search);
+        if (force || !localStorage.getItem('ours-intro-seen')) {
+          document.documentElement.classList.add('intro');
+          localStorage.setItem('ours-intro-seen', '1');
+        }
+      } catch (e) { /* no storage: just show the page */ }
+    })();
+  </script>
 </head>
 <body>
 
@@ -265,5 +298,117 @@
   <span class="age">For adults 18+</span>
 </footer>
 
+<script id="ours-intro-js">
+(function () {
+  var html = document.documentElement;
+  if (!html.classList.contains('intro')) return;
+  function done() { html.classList.add('intro-reveal'); html.classList.remove('intro'); }
+  var head = document.querySelector('header .rings');
+  if (!head || window.scrollY > 40) { done(); return; }
+
+  var FROM_KM = 1490, ENDING = 'Still ours.';            // the two lines of copy
+  var HIT = 2000, FLY = 2650, FLYLEN = 600, REVEAL = 2950, END = 3300;
+  var LEV = ['#F5D2C4', '#F3BFAD', '#F1AF9B', '#EE9C8B', '#EB8B7C', '#E8796B', '#E2705F'];
+  var ACCN = [201, 112, 90], ACC = 'rgb(201,112,90)';
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function cl(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function io(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function ss(a, b, x) { x = cl((x - a) / (b - a)); return x * x * (3 - 2 * x); }
+  function col(t) { return 'rgb(' + [0, 1, 2].map(function (i) { return Math.round(lerp(255, ACCN[i], t)); }).join(',') + ')'; }
+
+  // ---- the start: the laptop lid's two corners, one ring each ----
+  var vw = innerWidth, vh = innerHeight;
+  var R0 = 0.36 * Math.sqrt(vw * vh), sc = R0 / 1050, inset = 0.47 * R0, rStart = 0.2 * R0;
+  var A = { x: inset, y: inset }, B = { x: vw - inset, y: vh - inset }, C = { x: vw / 2, y: vh / 2 };
+  var rb = Math.min(vw, vh) * 0.16, d = 1.358 * rb;
+  var hr = head.getBoundingClientRect();
+  var T = { a: { x: hr.left + 28, y: hr.top + 28 }, b: { x: hr.right - 28, y: hr.top + 28 }, r: 26.5 };
+
+  function blob(cx, cy, r, k) {
+    var a = r * 0.026, s = '';
+    for (var i = 0; i <= 120; i++) {
+      var th = i / 120 * 2 * Math.PI, rr = r + a * Math.sin(5 * th + k * 1.3) + 0.5 * a * Math.sin(3 * th + k * 2.1);
+      s += (i ? 'L' : 'M') + (cx + rr * Math.cos(th)).toFixed(1) + ',' + (cy + rr * Math.sin(th)).toFixed(1);
+    }
+    return s + 'Z';
+  }
+  function field(c, k0) {
+    var S = Math.ceil(R0 * 2.5), h = S / 2, id = 'oif' + k0;
+    var s = '<svg class="oi-field" width="' + S + '" height="' + S + '" viewBox="0 0 ' + S + ' ' + S + '" style="left:' + (c.x - h) + 'px;top:' + (c.y - h) + 'px">'
+      + '<defs><filter id="' + id + '" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="' + 16 * sc + '" dy="' + 16 * sc
+      + '" stdDeviation="' + Math.max(2, 20 * sc) + '" flood-color="#5a2418" flood-opacity=".28"/></filter></defs>';
+    [1, .857, .729, .61, .5, .4, .314].forEach(function (f, k) {
+      var p = blob(h, h, R0 * f, k + k0);
+      s += '<path d="' + p + '" fill="' + LEV[k] + '" filter="url(#' + id + ')"/><path d="' + p + '" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1"/>';
+    });
+    return s + '</svg>';
+  }
+  var ov = document.createElement('div');
+  ov.id = 'ours-intro'; ov.setAttribute('aria-hidden', 'true');
+  ov.innerHTML = field(A, 0) + field(B, 5)
+    + '<svg width="' + vw + '" height="' + vh + '"><circle class="p" fill="none"/><circle class="r1" fill="none"/><circle class="r2" fill="none"/></svg>'
+    + '<div class="oi-txt"></div>';                      // the number sits in front of the rings so it stays readable
+  document.body.appendChild(ov);
+  var fA = ov.children[0], fB = ov.children[1], txt = ov.querySelector('.oi-txt');
+  var pulse = ov.querySelector('.p'), r1 = ov.querySelector('.r1'), r2 = ov.querySelector('.r2');
+  txt.style.top = (C.y + rb * 1.75) + 'px';
+
+  function ring(el, x, y, r, w, c) { el.setAttribute('cx', x); el.setAttribute('cy', y); el.setAttribute('r', r); el.setAttribute('stroke-width', w); el.setAttribute('stroke', c); }
+  function setText(h, o) { if (txt._h !== h) { txt.innerHTML = h; txt._h = h; } txt.style.opacity = o; }
+
+  function render(t) {
+    var p = cl((t - 700) / 1300), ep = io(p);
+    var r = lerp(rStart, rb, ep), w = lerp(0.2 * rStart, 0.17 * rb, ep), c = col(ss(HIT - 150, HIT + 100, t));
+    var x1 = lerp(A.x, C.x - d / 2, ep), y1 = lerp(A.y, C.y, ep), x2 = lerp(B.x, C.x + d / 2, ep), y2 = lerp(B.y, C.y, ep);
+    var fo = 1 - ss(HIT - 100, HIT + 250, t), s = lerp(1, .55, ep);
+    fA.style.transform = 'translate(' + (x1 - A.x) * .9 + 'px,' + (y1 - A.y) * .9 + 'px) scale(' + s + ')'; fA.style.opacity = fo;
+    fB.style.transform = 'translate(' + (x2 - B.x) * .9 + 'px,' + (y2 - B.y) * .9 + 'px) scale(' + s + ')'; fB.style.opacity = fo;
+    if (t > HIT) {                                         // the click: a small squeeze, then settle
+      var k = (t - HIT) / 300, o = k < 1 ? -0.16 * d * Math.exp(-k * 5) * Math.cos(k * Math.PI * 3) : 0;
+      x1 = C.x - (d + o) / 2; x2 = C.x + (d + o) / 2; y1 = y2 = C.y;
+    }
+    if (t < HIT) setText('<span class="n">' + Math.round(FROM_KM * (1 - ep)).toLocaleString('en-US') + ' km</span><span class="s">apart</span>', ss(250, 650, t));
+    else setText('<span class="w">' + ENDING + '</span>', 1 - ss(FLY, FLY + 250, t));
+    var k2 = cl((t - HIT) / 650);
+    ring(pulse, C.x, C.y, lerp(rb * 1.3, Math.hypot(vw, vh) * .6, 1 - Math.pow(1 - k2, 3)), lerp(5, 1, k2), ACC);
+    pulse.setAttribute('stroke-opacity', t > HIT ? (1 - k2) * .45 : 0);
+    var q = io(cl((t - FLY) / FLYLEN));                    // the end: fly up and become the header logo
+    if (q > 0) {
+      x1 = lerp(C.x - d / 2, T.a.x, q); y1 = lerp(C.y, T.a.y, q);
+      x2 = lerp(C.x + d / 2, T.b.x, q); y2 = lerp(C.y, T.b.y, q);
+      r = lerp(rb, T.r, q); w = lerp(w, 3, q);
+    }
+    ring(r1, x1, y1, r, w, c); ring(r2, x2, y2, r, w, c);
+  }
+
+  var finished = false, revealed = false, raf = 0;
+  function finish() {
+    if (finished) return; finished = true;
+    cancelAnimationFrame(raf); done();
+    if (ov.parentNode) ov.parentNode.removeChild(ov);
+  }
+  ['pointerdown', 'touchstart', 'wheel'].forEach(function (e) { ov.addEventListener(e, finish, { passive: true }); });
+  addEventListener('keydown', finish);
+
+  render(0);                                             // show the lid scene straight away
+  var started = false;
+  function start() {
+    if (started || finished) return; started = true;
+    var t0 = null;
+    function frame(now) {
+      if (finished) return;
+      if (t0 === null) t0 = now;
+      var t = now - t0;
+      render(t);
+      if (t >= REVEAL && !revealed) { revealed = true; html.classList.add('intro-reveal'); }
+      if (t >= END) { finish(); return; }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(start); setTimeout(start, 700); } else start();
+})();
+</script>
 </body>
 </html>
