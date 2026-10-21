@@ -98,6 +98,75 @@
       font-weight: 500;
     }
 
+    /* Waitlist */
+    .waitlist {
+      max-width: 420px;
+      margin: 2rem auto 0;
+    }
+
+    .waitlist .wl-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      font-size: 1.15rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .wl-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .wl-row input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 16px;            /* 16px+ stops iOS zooming into the field */
+      color: var(--ink);
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.7rem 1.1rem;
+      outline: none;
+    }
+
+    .wl-row input:focus { border-color: var(--accent); }
+
+    .wl-row button {
+      flex: none;
+      font: inherit;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 999px;
+      padding: 0.7rem 1.3rem;
+      cursor: pointer;
+    }
+
+    .wl-row button:disabled { opacity: 0.6; cursor: default; }
+
+    .wl-small {
+      margin-top: 0.7rem;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .wl-small a { color: var(--accent); }
+
+    .wl-msg {
+      margin-top: 0.8rem;
+      font-size: 0.95rem;
+      min-height: 1.5em;
+    }
+
+    .wl-msg.ok { color: var(--accent); }
+
+    .wl-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+    .waitlist.done .wl-row, .waitlist.done .wl-small { display: none; }
+
     /* Features */
     .features {
       border-top: 1px solid var(--border);
@@ -235,6 +304,16 @@
   <p class="tagline">Close the distance, together.</p>
   <p class="lede">A private space for the two of you — however many miles sit in between. Count down to the next visit, see the distance between you, and discover each other through questions you'd never think to ask.</p>
   <span class="badge">Coming soon to the App&nbsp;Store</span>
+  <form class="waitlist" id="waitlist" novalidate>
+    <p class="wl-title">Join the waitlist and hear the day Ours is out.</p>
+    <div class="wl-row">
+      <input type="email" id="wl-email" name="email" placeholder="Your email" autocomplete="email" required aria-label="Your email">
+      <button type="submit" id="wl-btn">Join</button>
+    </div>
+    <input type="text" name="company" id="wl-hp" class="wl-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="wl-small" id="wl-consent">We'll email you once, when Ours is on the App Store, and then delete your address. For adults 18+. <a href="/privacy#waitlist">Privacy</a></p>
+    <p class="wl-msg" id="wl-msg" role="status" aria-live="polite"></p>
+  </form>
 </header>
 
 <main class="wrap">
@@ -306,6 +385,50 @@
   <br>
   <span class="age">For adults 18+</span>
 </footer>
+
+<script id="ours-waitlist-js">
+(function () {
+  // Waitlist: one insert into Supabase table public.waitlist with the project's publishable key (anon may
+  // only insert; nobody can read the list from here). Migration 20261021000000_website_waitlist.sql in the app repo.
+  var URL = 'https://ijtosxifmldwaqzumbmp.supabase.co/rest/v1/waitlist';
+  var KEY = 'sb_publishable_-NdQT_giv2MIDJx04fiQoQ_CD4g9yty';   // publishable key: public by design, same one the app ships
+  var form = document.getElementById('waitlist');
+  if (!form || !window.fetch) return;
+  var email = document.getElementById('wl-email'), btn = document.getElementById('wl-btn');
+  var msg = document.getElementById('wl-msg'), hp = document.getElementById('wl-hp');
+  var consent = document.getElementById('wl-consent').textContent.replace(/\s*Privacy\s*$/, '').trim();
+
+  // ?ref=name (or utm_source) on the link tells us which post brought someone in.
+  var ref = null;
+  try {
+    var q = new URLSearchParams(location.search);
+    ref = (q.get('ref') || q.get('utm_source') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 60) || null;
+  } catch (e) { /* no source */ }
+
+  function say(text, ok) { msg.textContent = text; msg.className = 'wl-msg' + (ok ? ' ok' : ''); }
+  function welcome(text) { form.classList.add('done'); say(text, true); }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (hp.value) { welcome("You're on the list. See you soon."); return; }   // a bot filled the hidden field
+    var v = email.value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || v.length > 254) { say('That email doesn’t look right.'); email.focus(); return; }
+    btn.disabled = true; say('');
+    fetch(URL, {
+      method: 'POST',
+      headers: { 'apikey': KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ email: v, consent_text: consent, source: ref })
+    }).then(function (r) {
+      if (r.status === 201) welcome("You're on the list. We'll email you the day Ours is out.");
+      else if (r.status === 409) welcome("You're already on the list. We'll email you the day Ours is out.");
+      else throw new Error('status ' + r.status);
+    }).catch(function () {
+      btn.disabled = false;
+      say('Something went wrong. Please try again in a moment.');
+    });
+  });
+})();
+</script>
 
 <script id="ours-intro-js">
 (function () {
