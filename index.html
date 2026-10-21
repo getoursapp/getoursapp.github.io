@@ -391,7 +391,7 @@
   // Waitlist: one insert into Supabase table public.waitlist with the project's publishable key (anon may
   // only insert; nobody can read the list from here). Migration 20261021000000_website_waitlist.sql in the app repo.
   var URL = 'https://ijtosxifmldwaqzumbmp.supabase.co/rest/v1/waitlist';
-  var KEY = 'PASTE_PUBLISHABLE_KEY_HERE';   // Supabase > Project Settings > API Keys > Publishable key (sb_publishable_...)
+  var KEY = 'sb_publishable_-NdQT_giv2MIDJx04fiQoQ_CD4g9yty';   // publishable key: public by design, same one the app ships
   var form = document.getElementById('waitlist');
   if (!form || !window.fetch) return;
   var email = document.getElementById('wl-email'), btn = document.getElementById('wl-btn');
