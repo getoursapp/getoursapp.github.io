@@ -1,39 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Join Ours</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>You've been invited to Ours</title>
+  <meta name="description" content="Your partner invited you to Ours, a private app for the two of you.">
+  <meta name="color-scheme" content="light dark">
+  <!-- The link card in iMessage and other chats (the code is never in it). -->
+  <meta property="og:title" content="Join me on Ours">
+  <meta property="og:description" content="A private app for the two of you.">
+  <meta property="og:site_name" content="getours.site">
+  <meta property="og:image" content="https://getours.site/images/ours-app-icon.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="600">
+  <meta name="twitter:card" content="summary">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    body { font-family: -apple-system, sans-serif; background: #FDF6F0; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-    .card { text-align: center; padding: 40px; }
-    h1 { color: #3D2418; font-size: 24px; margin-bottom: 8px; }
-    p { color: #8B6356; font-size: 16px; }
-    #msg { display: none; margin-top: 20px; }
-    .code { background: #F2D8CE; border-radius: 12px; padding: 12px 24px; font-size: 20px; font-weight: 700; color: #3D2418; letter-spacing: 2px; margin-top: 12px; display: inline-block; }
-  </style>
-  <script>
-    window.onload = function() {
-      const parts = window.location.pathname.split('/');
-      const code = parts[parts.length - 1];
-      if (code && code !== 'join') {
-        document.getElementById('codeDisplay').textContent = code;
-        window.location.href = 'ours://join/' + code;
+    /* An invite link from the Ours app: https://getours.site/join?code=OURS-XXXXXX (and the old
+       /join/OURS-XXXXXX). With Ours installed the phone opens the app instead of this page
+       (Universal Links, /.well-known/apple-app-site-association). Nothing is stored here. */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #faf7f2; --warm-white: #fff9f4; --ink: #1a1612; --muted: #6b6460;
+      --accent: #c9705a; --border: #e8e0d8; --store-bg: #000; --store-ink: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      /* The site has no dark mode elsewhere; these follow the app's dark Rose. */
+      :root {
+        --cream: #1b1513; --warm-white: #2e2824; --ink: #f3e6df; --muted: #bfa79c;
+        --accent: #e0856f; --border: #4d423e; --store-bg: #fff; --store-ink: #000;
       }
-      setTimeout(() => {
-        document.getElementById('msg').style.display = 'block';
-      }, 1500);
-    };
-  </script>
+    }
+    html { background: var(--cream); }
+    body {
+      font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 16px; line-height: 1.6;
+      color: var(--ink); background: var(--cream); min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: max(48px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom));
+    }
+    main { width: 100%; max-width: 380px; display: grid; gap: 22px; justify-items: center; text-align: center; }
+    .mark { display: flex; }
+    .mark i { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent); }
+    .mark i + i { margin-left: -12px; }
+    .wordmark { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: 3rem; line-height: 1; margin-top: -8px; }
+    h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: 1.6rem; line-height: 1.25; }
+    .codebox {
+      width: 100%; background: var(--warm-white); border: 1px solid var(--border); border-radius: 18px;
+      padding: 20px 16px; display: grid; gap: 12px; justify-items: center;
+    }
+    .label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.18em; color: var(--muted); }
+    .code { font-weight: 500; font-size: 2rem; letter-spacing: 0.08em; user-select: all; -webkit-user-select: all; }
+    .copy {
+      font: inherit; font-size: 0.9rem; font-weight: 500; color: var(--accent); background: transparent;
+      border: 1.5px solid var(--accent); border-radius: 999px; padding: 6px 20px; cursor: pointer; min-height: 36px;
+    }
+    .how { font-size: 0.95rem; color: var(--muted); max-width: 32ch; }
+    .store {
+      display: inline-flex; align-items: center; gap: 10px; background: var(--store-bg); color: var(--store-ink);
+      border-radius: 12px; padding: 9px 18px 9px 14px; text-decoration: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    }
+    .store .logo { font-size: 1.7rem; line-height: 1; }
+    .store small { display: block; font-size: 0.66rem; line-height: 1; text-align: left; }
+    .store b { display: block; font-size: 1.25rem; font-weight: 600; line-height: 1.15; text-align: left; }
+    .open { font-size: 0.95rem; font-weight: 500; color: var(--accent); }
+    .bad { color: var(--muted); font-size: 1rem; max-width: 30ch; }
+    [hidden] { display: none !important; }
+    footer { margin-top: auto; padding-top: 40px; font-size: 0.8rem; color: var(--muted); }
+    footer a { color: inherit; }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <div style="font-size:48px;margin-bottom:16px">💍💍</div>
-    <h1>Opening Ours...</h1>
-    <p>You've been invited to connect on Ours 💕</p>
-    <div id="msg">
-      <p>If the app didn't open, enter this code manually:</p>
-      <div class="code" id="codeDisplay"></div>
-    </div>
-  </div>
+  <main>
+    <div class="mark" aria-hidden="true"><i></i><i></i></div>
+    <div class="wordmark">Ours</div>
+
+    <section id="ok" hidden style="display:grid;gap:22px;justify-items:center;width:100%">
+      <h1>You've been invited to Ours</h1>
+      <div class="codebox">
+        <div class="label">YOUR INVITE CODE</div>
+        <div class="code" id="code"></div>
+        <button class="copy" id="copy" type="button">Copy code</button>
+      </div>
+      <p class="how">Once Ours is installed, tap your invite link again, or enter this code in Settings&nbsp;›&nbsp;Account&nbsp;&amp;&nbsp;Profile&nbsp;›&nbsp;Partner&nbsp;link.</p>
+      <a class="store" href="https://apps.apple.com/app/id6795591395">
+        <span class="logo" aria-hidden="true"></span>
+        <span><small>Download on the</small><b>App Store</b></span>
+      </a>
+      <!-- In-app browsers (Instagram and others) don't open Universal Links: this is the way out. -->
+      <a class="open" id="open" href="ours://join">Already have Ours? Open it</a>
+    </section>
+
+    <section id="bad" hidden style="display:grid;gap:22px;justify-items:center">
+      <h1>This invite link looks incomplete</h1>
+      <p class="bad">Ask your partner for their code.</p>
+      <a class="store" href="https://apps.apple.com/app/id6795591395">
+        <span class="logo" aria-hidden="true"></span>
+        <span><small>Download on the</small><b>App Store</b></span>
+      </a>
+    </section>
+  </main>
+  <footer><a href="/">getours.site</a> · <a href="/privacy">Privacy</a></footer>
+
+  <script>
+    (function () {
+      // ?code=OURS-XXXXXX, or the old path form /join/OURS-XXXXXX.
+      var raw = new URLSearchParams(location.search).get('code') || '';
+      if (!raw) {
+        var parts = location.pathname.split('/').filter(Boolean);
+        if (parts[0] === 'join' && parts[1]) raw = decodeURIComponent(parts[1]);
+      }
+      var code = raw.trim().toUpperCase();
+      if (!/^OURS-[A-Z0-9]{6}$/.test(code)) {
+        document.getElementById('bad').hidden = false;
+        return;
+      }
+      document.getElementById('ok').hidden = false;
+      document.getElementById('code').textContent = code;
+      document.getElementById('open').href = 'ours://join?code=' + encodeURIComponent(code);
+      var btn = document.getElementById('copy');
+      btn.addEventListener('click', function () {
+        function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy code'; }, 2000); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(done, function () { selectCode(); });
+        } else {
+          selectCode();
+        }
+      });
+      function selectCode() {
+        var r = document.createRange();
+        r.selectNodeContents(document.getElementById('code'));
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      }
+    })();
+  </script>
 </body>
 </html>

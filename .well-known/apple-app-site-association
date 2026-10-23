@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["Y27KK3JBKJ.com.getoursapp.ours"],
+        "components": [
+          { "/": "/join", "comment": "invite link: /join?code=OURS-XXXXXX" },
+          { "/": "/join/*", "comment": "old path form /join/OURS-XXXXXX, and /join/?code=" }
+        ]
+      }
+    ]
+  }
+}
