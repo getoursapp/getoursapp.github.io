@@ -64,6 +64,7 @@
     .store small { display: block; font-size: 0.66rem; line-height: 1; text-align: left; }
     .store b { display: block; font-size: 1.25rem; font-weight: 600; line-height: 1.15; text-align: left; }
     .open { font-size: 0.95rem; font-weight: 500; color: var(--accent); }
+    .stuck { font-size: 0.95rem; color: var(--muted); max-width: 32ch; }
     .bad { color: var(--muted); font-size: 1rem; max-width: 30ch; }
     [hidden] { display: none !important; }
     footer { margin-top: auto; padding-top: 40px; font-size: 0.8rem; color: var(--muted); }
@@ -87,8 +88,11 @@
         <span class="logo" aria-hidden="true"></span>
         <span><small>Download on the</small><b>App Store</b></span>
       </a>
-      <!-- In-app browsers (Instagram and others) don't open Universal Links: this is the way out. -->
+      <!-- In-app browsers (Instagram and others) don't open Universal Links: this is the way out.
+           Many of them also drop ours:// without a word (25 Oct, Owen: "Open it does nothing"),
+           so the tap copies the code first and says what to do if Ours did not open. -->
       <a class="open" id="open" href="ours://join">Already have Ours? Open it</a>
+      <p class="stuck" id="stuck" hidden role="status">If Ours didn't open: your code is copied. Open Ours and paste it in Settings&nbsp;›&nbsp;Account&nbsp;&amp;&nbsp;Profile&nbsp;›&nbsp;Partner&nbsp;link. Or open this page in Safari and tap Open it again.</p>
     </section>
 
     <section id="bad" hidden style="display:grid;gap:22px;justify-items:center">
@@ -117,7 +121,20 @@
       }
       document.getElementById('ok').hidden = false;
       document.getElementById('code').textContent = code;
-      document.getElementById('open').href = 'ours://join?code=' + encodeURIComponent(code);
+      var appLink = 'ours://join?code=' + encodeURIComponent(code);
+      var open = document.getElementById('open');
+      open.href = appLink;
+      // Copy while the tap still counts as the person's own (the clipboard needs that), then
+      // leave for the app. When Ours opens, this page goes to the background; still showing
+      // 1.5 s later means the browser dropped the link, so say what to do instead.
+      open.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).catch(function () {});
+        location.href = appLink;
+        setTimeout(function () {
+          if (document.visibilityState === 'visible') document.getElementById('stuck').hidden = false;
+        }, 1500);
+      });
       var btn = document.getElementById('copy');
       btn.addEventListener('click', function () {
         function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy code'; }, 2000); }
